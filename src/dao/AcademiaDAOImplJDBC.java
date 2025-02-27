@@ -108,8 +108,8 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "INSERT INTO alumnos VALUES(?,?);";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(0, alumno.getIdAlumno());
-			pStmt.setString(1, alumno.getNombreAlumno());
+			pStmt.setInt(1, alumno.getIdAlumno());
+			pStmt.setString(2, alumno.getNombreAlumno());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -123,8 +123,8 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "UPDATE alumnos SET nombre_alumno = '?' WHERE id_alumno = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setString(0, alumno.getNombreAlumno());
-			pStmt.setInt(1, alumno.getIdAlumno());
+			pStmt.setString(1, alumno.getNombreAlumno());
+			pStmt.setInt(2, alumno.getIdAlumno());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -138,7 +138,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "DELETE FROM alumnos WHERE id_alumno = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(0, idAlumno);
+			pStmt.setInt(1, idAlumno);
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -191,8 +191,8 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "INSERT INTO cursos VALUES(?,?);";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(0, curso.getIdCurso());
-			pStmt.setString(1, curso.getNombreCurso());
+			pStmt.setInt(1, curso.getIdCurso());
+			pStmt.setString(2, curso.getNombreCurso());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -206,8 +206,8 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "UPDATE cursos SET nombre_curso = '?' WHERE id_curso = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setString(0, curso.getNombreCurso());
-			pStmt.setInt(1, curso.getIdCurso());
+			pStmt.setString(1, curso.getNombreCurso());
+			pStmt.setInt(2, curso.getIdCurso());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -221,7 +221,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "DELETE FROM cursos WHERE id_curso = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(0, idCurso);
+			pStmt.setInt(1, idCurso);
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -263,7 +263,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + " AND id_curso = " + idCurso + ";";
 			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet res = a.executeQuery(query);
-			long idMatricula = res.getLong(0);
+			long idMatricula = res.getLong(1);
 			return idMatricula;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -305,10 +305,10 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "INSERT INTO matriculas (id_alumno, id_curso, fecha_inicio) VALUES(?,?,?);";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			//pStmt.setLong(0, matricula.getIdmatricula());
-			pStmt.setInt(0, matricula.getIdAlumno());
-			pStmt.setInt(1, matricula.getIdCurso());
-			pStmt.setDate(2, (java.sql.Date) matricula.getFechaInicio());
+			//pStmt.setLong(1, matricula.getIdmatricula());
+			pStmt.setInt(1, matricula.getIdAlumno());
+			pStmt.setInt(2, matricula.getIdCurso());
+			pStmt.setDate(3, (java.sql.Date) matricula.getFechaInicio());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -322,9 +322,9 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "UPDATE matriculas SET id_alumno = '?', id_curso = '?' WHERE id_matricula = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(0, matricula.getIdAlumno());
-			pStmt.setInt(1, matricula.getIdCurso());
-			pStmt.setLong(2, matricula.getIdmatricula());
+			pStmt.setInt(1, matricula.getIdAlumno());
+			pStmt.setInt(2, matricula.getIdCurso());
+			pStmt.setLong(3, matricula.getIdmatricula());
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -338,7 +338,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			Connection con = getConnection();
 			String query = "DELETE FROM matriculas WHERE id_matricula = '?';";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setLong(0, idMatricula);
+			pStmt.setLong(1, idMatricula);
 			return pStmt.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
