@@ -92,7 +92,24 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public Alumno getAlumno(int idAlumno) {
 		try {
 			Connection con = getConnection();
-			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno= " + idAlumno + ";";
+			String query = "SELECT id_alumno, nombre_alumno FROM alumnos WHERE id_alumno= ?;";
+			PreparedStatement pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, idAlumno);
+			ResultSet res = pStmt.executeQuery();
+	
+			if (res.next()) {
+			    return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
+			} else {
+			    return null;  // Handle case where student is not found
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+		/*try {
+			Connection con = getConnection();
+			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + ";";
 			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet res = a.executeQuery(query);
 			return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
@@ -100,7 +117,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			e.printStackTrace();
 			return null;
 		}
-	}
+	}*/
 
 	@Override
 	public int grabarAlumno(Alumno alumno) {
@@ -110,7 +127,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, alumno.getIdAlumno());
 			pStmt.setString(2, alumno.getNombreAlumno());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -121,11 +138,11 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int actualizarAlumno(Alumno alumno) {
 		try {
 			Connection con = getConnection();
-			String query = "UPDATE alumnos SET nombre_alumno = '?' WHERE id_alumno = '?';";
+			String query = "UPDATE alumnos SET nombre_alumno = ? WHERE id_alumno = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setString(1, alumno.getNombreAlumno());
 			pStmt.setInt(2, alumno.getIdAlumno());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -136,10 +153,10 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int borrarAlumno(int idAlumno) {
 		try {
 			Connection con = getConnection();
-			String query = "DELETE FROM alumnos WHERE id_alumno = '?';";
+			String query = "DELETE FROM alumnos WHERE id_alumno = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, idAlumno);
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -175,16 +192,42 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public Curso getCurso(int idCurso) {
 		try {
 			Connection con = getConnection();
-			String query = "Select nombre_curso FROM cursos WHERE id_curso = " + idCurso + ";";
-			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet res = a.executeQuery(query);
-			return new Curso(res.getInt("id_curso"), res.getString("nombre_curso"));
+			String query = "SELECT id_curso, nombre_curso FROM cursos WHERE id_curso = ?;";
+			PreparedStatement pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, idCurso);
+			ResultSet res = pStmt.executeQuery();
+			
+			if (res.next()) {
+				return new Curso(res.getInt("id_curso"), res.getString("nombre_curso"));
+			} else {
+			    return null;  // Handle case where student is not found
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-
+	
+	public Alumno getAlumno(int idAlumno) {
+		try {
+			Connection con = getConnection();
+			String query = "SELECT id_alumno, nombre_alumno FROM alumnos WHERE id_alumno= ?;";
+			PreparedStatement pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, idAlumno);
+			ResultSet res = pStmt.executeQuery();
+	
+			if (res.next()) {
+			    return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
+			} else {
+			    return null;  // Handle case where student is not found
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	@Override
 	public int grabarCurso(Curso curso) {
 		try {
@@ -193,7 +236,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, curso.getIdCurso());
 			pStmt.setString(2, curso.getNombreCurso());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -204,11 +247,11 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int actualizarCurso(Curso curso) {
 		try {
 			Connection con = getConnection();
-			String query = "UPDATE cursos SET nombre_curso = '?' WHERE id_curso = '?';";
+			String query = "UPDATE cursos SET nombre_curso = ? WHERE id_curso = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setString(1, curso.getNombreCurso());
 			pStmt.setInt(2, curso.getIdCurso());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -219,10 +262,10 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int borrarCurso(int idCurso) {
 		try {
 			Connection con = getConnection();
-			String query = "DELETE FROM cursos WHERE id_curso = '?';";
+			String query = "DELETE FROM cursos WHERE id_curso = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, idCurso);
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -309,7 +352,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			pStmt.setInt(1, matricula.getIdAlumno());
 			pStmt.setInt(2, matricula.getIdCurso());
 			pStmt.setDate(3, (java.sql.Date) matricula.getFechaInicio());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -320,12 +363,12 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int actualizarMatricula(Matricula matricula) {
 		try {
 			Connection con = getConnection();
-			String query = "UPDATE matriculas SET id_alumno = '?', id_curso = '?' WHERE id_matricula = '?';";
+			String query = "UPDATE matriculas SET id_alumno = ?, id_curso = ? WHERE id_matricula = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, matricula.getIdAlumno());
 			pStmt.setInt(2, matricula.getIdCurso());
 			pStmt.setLong(3, matricula.getIdmatricula());
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
@@ -336,10 +379,10 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int borrarMatricula(long idMatricula) {
 		try {
 			Connection con = getConnection();
-			String query = "DELETE FROM matriculas WHERE id_matricula = '?';";
+			String query = "DELETE FROM matriculas WHERE id_matricula = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setLong(1, idMatricula);
-			return pStmt.executeUpdate(query);
+			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
