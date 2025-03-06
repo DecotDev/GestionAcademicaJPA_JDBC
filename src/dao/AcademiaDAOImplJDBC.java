@@ -23,7 +23,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	 */
 	private static final String FIND_ALL_ALUMNOS_SQL = "select id_alumno, nombre_alumno from alumnos";
 	private static final String FIND_ALL_CURSOS_SQL = "select id_curso, nombre_curso from cursos";
-	private static final String FIND_ALL_MATRICULAS_SQL = "select id_matriucla, id_alumno, id_curso, fecha_inicio from matriculas";
+	private static final String FIND_ALL_MATRICULAS_SQL = "select id_matricula, id_alumno, id_curso, fecha_inicio from matriculas";
 
 
 	/*
@@ -200,7 +200,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			if (res.next()) {
 				return new Curso(res.getInt("id_curso"), res.getString("nombre_curso"));
 			} else {
-			    return null;  // Handle case where student is not found
+			    return null; 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -299,24 +299,37 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public Matricula getMatricula(long idMatricula) {
 		try {
 			Connection con = getConnection();
-			String query = "Select * FROM matriculas WHERE id_matricula = " + idMatricula + ";";
-			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet res = a.executeQuery(query);
-			return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+			String query = "Select * FROM matriculas WHERE id_matricula = ?;";
+			PreparedStatement pStmt = con.prepareStatement(query);
+			pStmt.setLong(1, idMatricula);
+			ResultSet res = pStmt.executeQuery();
+			
+			if (res.next()) {
+				return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+			} else {
+			    return null; 
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
+
 	@Override
 	public Matricula getMatricula(int idAlumno, int idCurso) {
 		try {
 			Connection con = getConnection();
-			String query = "Select * FROM matriculas WHERE id_alumno = " + idAlumno + " AND id_curso = " + idCurso + ";";
-			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet res = a.executeQuery(query);
-			return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+			String query = "Select * FROM matriculas WHERE id_alumno = ? AND id_curso = ?;";
+			PreparedStatement pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, idAlumno);
+			pStmt.setInt(2, idCurso);
+			ResultSet res = pStmt.executeQuery();
+			if (res.next()) {
+				return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+			} else {
+			    return null;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -332,7 +345,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			//pStmt.setLong(1, matricula.getIdmatricula());
 			pStmt.setInt(1, matricula.getIdAlumno());
 			pStmt.setInt(2, matricula.getIdCurso());
-			pStmt.setDate(3, (java.sql.Date) matricula.getFechaInicio());
+			pStmt.setDate(3, new java.sql.Date(matricula.getFechaInicio().getTime()));
 			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
