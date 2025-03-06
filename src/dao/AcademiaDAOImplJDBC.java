@@ -207,26 +207,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			return null;
 		}
 	}
-	
-	public Alumno getAlumno(int idAlumno) {
-		try {
-			Connection con = getConnection();
-			String query = "SELECT id_alumno, nombre_alumno FROM alumnos WHERE id_alumno= ?;";
-			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(1, idAlumno);
-			ResultSet res = pStmt.executeQuery();
-	
-			if (res.next()) {
-			    return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
-			} else {
-			    return null;  // Handle case where student is not found
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
+
 	
 	@Override
 	public int grabarCurso(Curso curso) {
