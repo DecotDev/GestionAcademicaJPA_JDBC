@@ -24,20 +24,25 @@ public class InsertarHelper {
 	 * Alumnos
 	 */
 	private void insertarAlumno(int id, String nombre) {
+		if (dao.getAlumno(id) != null) {
+			System.out.println("\nEl alumno con id " + id + " ya existe, no se insertará.");
+			return;
+		}
 		System.out.println("\nCreando un alumno...");
 		Alumno alumno = new Alumno(id, nombre);
 		System.out.println("Grabando el nuevo alumno...");
 		if (dao.grabarAlumno(alumno) == 1) {
-			System.out.print("Se ha grabado el alumno");
+			System.out.println("Se ha grabado el alumno");
 		} else {
-			System.out.print("Error al grabar el alumno");
+			System.out.println("Error al grabar el alumno");
 		}
 	}
 
 	private void modificarAlumno(int id, String nombre) {
 		// Recuperamos al alumno a partir de su id
 		Alumno alumno = dao.getAlumno(id);
-		System.out.println("\nModificando el nombre del alumno con id: " + id + " y nombre: " + alumno.getNombreAlumno());
+		System.out
+				.println("\nModificando el nombre del alumno con id: " + id + " y nombre: " + alumno.getNombreAlumno());
 		alumno.setNombreAlumno(nombre);
 		if (dao.actualizarAlumno(alumno) == 1) {
 			System.out.print("Se ha modificado el alumno con id: " + id);
@@ -50,13 +55,17 @@ public class InsertarHelper {
 	 * Cursos
 	 */
 	private void insertarCurso(int id, String nombre) {
+		if (dao.getCurso(id) != null) {
+			System.out.println("\nEl curso con id " + id + " ya existe, no se insertará.");
+			return;
+		}
 		System.out.println("\nCreando un curso...");
 		Curso curso = new Curso(id, nombre);
 		System.out.println("Grabando el nuevo curso...");
 		if (dao.grabarCurso(curso) == 1) {
-			System.out.print("Se ha grabado el curso");
+			System.out.println("Se ha grabado el curso");
 		} else {
-			System.out.print("Error al grabar el curso");
+			System.out.println("Error al grabar el curso");
 		}
 	}
 
@@ -75,19 +84,26 @@ public class InsertarHelper {
 	 * Matriculas
 	 */
 	private void insertarMatricula(int idAlumno, int idCurso) {
-		System.out.println("\nCreando una matricula...");
+		if (dao.getMatricula(idAlumno, idCurso) != null) {
+			System.out.println(
+					"\nLa matrícula del alumno " + idAlumno + " en el curso " + idCurso + " ya existe, no se insertará.");
+			return;
+		}
+		System.out.println("\nCreando una matrícula...");
 		Matricula matricula = new Matricula(idAlumno, idCurso);
-		System.out.println("Grabando la nueva matricula...");
+		System.out.println("Grabando la nueva matrícula...");
 		if (dao.grabarMatricula(matricula) == 1) {
-			System.out.print("Se ha grabado la matricula");
+			System.out.println("Se ha grabado la matrícula");
 		} else {
-			System.out.print("Error al grabar la matricula");
+			System.out.println("Error al grabar la matrícula");
 		}
 	}
 
 	private void modificarMatricula(int idAlumno, int idCurso, java.util.Date fecha) {
 		Matricula matricula = dao.getMatricula(idAlumno, idCurso);
-		System.out.println("\nModificando el id de alumno i/o de curso de la matricula con id: " + matricula.getIdmatricula() + " y los anteriores, id_alumno: " + matricula.getIdAlumno() + " id_curso: " + matricula.getIdCurso());
+		System.out.println("\nModificando el id de alumno i/o de curso de la matricula con id: "
+				+ matricula.getIdmatricula() + " y los anteriores, id_alumno: " + matricula.getIdAlumno()
+				+ " id_curso: " + matricula.getIdCurso());
 		matricula.setIdAlumno(idAlumno);
 		matricula.setIdCurso(idCurso);
 		matricula.setFechaInicio(fecha);
@@ -145,6 +161,6 @@ public class InsertarHelper {
 		 * 
 		 */
 		programa.showAllData();
-		System.out.println("\nfin del programa.");
+		System.out.println("\nFin del programa.");
 	}
 }
