@@ -357,11 +357,12 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public int actualizarMatricula(Matricula matricula) {
 		try {
 			Connection con = getConnection();
-			String query = "UPDATE matriculas SET id_alumno = ?, id_curso = ? WHERE id_matricula = ?;";
+			String query = "UPDATE matriculas SET id_alumno = ?, id_curso = ?, fecha_inicio = ? WHERE id_matricula = ?;";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, matricula.getIdAlumno());
 			pStmt.setInt(2, matricula.getIdCurso());
-			pStmt.setLong(3, matricula.getIdmatricula());
+			pStmt.setDate(3, new java.sql.Date(matricula.getFechaInicio().getTime()));
+			pStmt.setLong(4, matricula.getIdmatricula());
 			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
