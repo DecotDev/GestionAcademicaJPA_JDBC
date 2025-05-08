@@ -2,13 +2,23 @@ package entidades;
 
 import java.io.Serializable;
 
-public class Curso implements Serializable{
-	
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "cursos")
+public class Curso implements Serializable {
+
 	private static final long serialVersionUID = 1L;
-	private int idCurso;
-	private String nombreCurso;
 	
-	public Curso() {}
+	@Id
+	@Column(name = "id_curso")
+	private int idCurso;
+	
+	@Column(name = "nombre_curso", nullable = false)
+	private String nombreCurso;
+
+	public Curso() {
+	}
 
 	public Curso(int idCurso, String nombreCurso) {
 		this.idCurso = idCurso;
@@ -30,9 +40,9 @@ public class Curso implements Serializable{
 	public void setNombreCurso(String nombreCurso) {
 		this.nombreCurso = nombreCurso;
 	}
-	
+
 	public String toString() {
-		return this.idCurso+" - "+this.nombreCurso;
+		return this.idCurso + " - " + this.nombreCurso;
 	}
-	
+
 }
