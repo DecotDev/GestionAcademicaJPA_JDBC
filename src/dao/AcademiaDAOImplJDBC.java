@@ -1,6 +1,8 @@
 package dao;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Executable;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,10 +23,19 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	/*
 	 * SQL
 	 */
-	private static final String FIND_ALL_ALUMNOS_SQL = "select id_alumno, nombre_alumno from alumnos";
+	private static final String FIND_ALL_ALUMNOS_SQL = "select id_alumno, nombre_alumno, foto from alumnos";
+
+	private static final String ADD_ALUMNO_SQL = "insert into alumnos" + " (id_alumno, nombre_alumno, foto) "
+			+ " values (?,?,?) ";
+
+	private static final String UPDATE_ALUMNO_SQL = "update alumnos set nombre_alumno=?, foto=? "
+			+ " where id_alumno=? ";
+
+	private static final String GET_ALUMNO_SQL = " select id_alumno, nombre_alumno, foto " + " from alumnos "
+			+ " where id_alumno = ?";
+
 	private static final String FIND_ALL_CURSOS_SQL = "select id_curso, nombre_curso from cursos";
 	private static final String FIND_ALL_MATRICULAS_SQL = "select id_matricula, id_alumno, id_curso, fecha_inicio from matriculas";
-
 
 	/*
 	 * CONSTRUCTORES
@@ -74,7 +85,14 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			while (rs.next()) {
 				int id = rs.getInt(1);
 				String nombre = (rs.getString(2) != null ? rs.getString(2) : "sin nombre");
-				alumnos.add(new Alumno(id, nombre));
+				Blob foto = rs.getBlob(3);
+				// alumnos.add(new Alumno(id, nombre));
+				Alumno alumno = new Alumno(id, nombre);
+				if (foto != null)
+					alumno.setFoto(foto.getBytes(1L, (int) foto.length()));
+				else
+					alumno.setFoto(null);
+				alumnos.add(alumno);
 			}
 			rs.close();
 			ps.close();
@@ -90,50 +108,133 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 
 	@Override
 	public Alumno getAlumno(int idAlumno) {
+		Connection con = null;
 		try {
-			Connection con = getConnection();
-			String query = "SELECT id_alumno, nombre_alumno FROM alumnos WHERE id_alumno= ?;";
-			PreparedStatement pStmt = con.prepareStatement(query);
-			pStmt.setInt(1, idAlumno);
-			ResultSet res = pStmt.executeQuery();
-	
-			if (res.next()) {
-			    return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
-			} else {
-			    return null;  // Handle case where student is not found
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-		/*try {
-			Connection con = getConnection();
-			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + ";";
-			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet res = a.executeQuery(query);
-			return new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}*/
+			con = getConnection();
+			PreparedStatement ps = con.prepareStatement(GET_ALUMNO_SQL);
+			ps.setInt(1, idAlumno);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				int id_Alumno = rs.getInt(1);
 
+				String nombreAlumno = (rs.getString(2) != null ? rs.getString(2) : "sin nombre");
+				Blob foto = rs.getBlob(3);
+				Alumno alumno = new Alumno(id_Alumno, nombreAlumno);
+				if (foto != null)
+					alumno.setFoto(foto.getBytes(1L, (int) foto.length()));
+				else
+					alumno.setFoto(null);
+				return alumno;
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			for (Throwable t : e) {
+				System.err.println("Errores: " + t);
+			}
+		} finally {
+			releaseConnection(con);
+		}
+		return null;
+	}
+
+	/*
+	 * @Override public Alumno getAlumno(int idAlumno) { try { Connection con =
+	 * getConnection(); String query =
+	 * "SELECT id_alumno, nombre_alumno FROM alumnos WHERE id_alumno= ?;";
+	 * PreparedStatement pStmt = con.prepareStatement(query); pStmt.setInt(1,
+	 * idAlumno); ResultSet res = pStmt.executeQuery();
+	 * 
+	 * if (res.next()) { return new Alumno(res.getInt("id_alumno"),
+	 * res.getString("nombre_alumno")); } else { return null; // Handle case where
+	 * student is not found } } catch (SQLException e) { e.printStackTrace(); return
+	 * null; } }
+	 */
+	/*
+	 * try { Connection con = getConnection(); String query =
+	 * "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + ";";
+	 * Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+	 * ResultSet.CONCUR_READ_ONLY); ResultSet res = a.executeQuery(query); return
+	 * new Alumno(res.getInt("id_alumno"), res.getString("nombre_alumno")); } catch
+	 * (SQLException e) { e.printStackTrace(); return null; } }
+	 */
+
+	@Override
+	public int grabarAlumno(Alumno alumno) {
+		int retorno=0;
+		Connection con = null;
+		try {
+			con = getConnection();
+			PreparedStatement pStmt = con.prepareStatement(ADD_ALUMNO_SQL);
+			pStmt.setInt(1, alumno.getIdAlumno());			
+			pStmt.setString(2, alumno.getNombreAlumno());	
+			
+			if (alumno.getFoto()!=null) {
+				pStmt.setBinaryStream(3, 
+						new ByteArrayInputStream(alumno.getFoto()));
+			} else {
+				pStmt.setBinaryStream(3, null);
+			}			
+			
+			retorno=pStmt.executeUpdate();
+			pStmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			releaseConnection(con);			
+		}
+		return retorno;
+	}
+
+	/* Version antigua
 	@Override
 	public int grabarAlumno(Alumno alumno) {
 		try {
 			Connection con = getConnection();
-			String query = "INSERT INTO alumnos VALUES(?,?);";
+			String query = "INSERT INTO alumnos VALUES(?,?,?);";
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, alumno.getIdAlumno());
 			pStmt.setString(2, alumno.getNombreAlumno());
+			if (alumno.getFoto() != null) {
+				pStmt.setBinaryStream(3, new ByteArrayInputStream(alumno.getFoto()));
+			} else {
+				pStmt.setBinaryStream(3, null);
+			}
 			return pStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
 		}
+	}*/
+
+	@Override
+	public int actualizarAlumno(Alumno alumno) {
+		int retorno=0;
+		Connection con = null;
+		try {
+			con = getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_ALUMNO_SQL);
+			ps.setString(1, alumno.getNombreAlumno());
+			
+			if (alumno.getFoto() != null) {
+				ps.setBinaryStream(2, new ByteArrayInputStream(alumno
+						.getFoto()));
+			} else {
+				ps.setBinaryStream(2, null);
+			}
+			
+			ps.setInt(3, alumno.getIdAlumno());			
+			retorno=ps.executeUpdate();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			releaseConnection(con);
+		}
+		return retorno;
 	}
 
+	/* Version antigua
 	@Override
 	public int actualizarAlumno(Alumno alumno) {
 		try {
@@ -147,7 +248,7 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			e.printStackTrace();
 			return -1;
 		}
-	}
+	}*/
 
 	@Override
 	public int borrarAlumno(int idAlumno) {
@@ -196,11 +297,11 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, idCurso);
 			ResultSet res = pStmt.executeQuery();
-			
+
 			if (res.next()) {
 				return new Curso(res.getInt("id_curso"), res.getString("nombre_curso"));
 			} else {
-			    return null; 
+				return null;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -208,7 +309,6 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 		}
 	}
 
-	
 	@Override
 	public int grabarCurso(Curso curso) {
 		try {
@@ -284,7 +384,8 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 	public long getIdMatricula(int idAlumno, int idCurso) {
 		try {
 			Connection con = getConnection();
-			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + " AND id_curso = " + idCurso + ";";
+			String query = "Select nombre_alumno FROM alumnos WHERE id_alumno = " + idAlumno + " AND id_curso = "
+					+ idCurso + ";";
 			Statement a = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet res = a.executeQuery(query);
 			long idMatricula = res.getLong(1);
@@ -303,18 +404,18 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			PreparedStatement pStmt = con.prepareStatement(query);
 			pStmt.setLong(1, idMatricula);
 			ResultSet res = pStmt.executeQuery();
-			
+
 			if (res.next()) {
-				return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+				return new Matricula(res.getLong("id_matricula"), res.getInt("id_alumno"), res.getInt("id_curso"),
+						res.getDate("fecha_inicio"));
 			} else {
-			    return null; 
+				return null;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-
 
 	@Override
 	public Matricula getMatricula(int idAlumno, int idCurso) {
@@ -326,23 +427,24 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			pStmt.setInt(2, idCurso);
 			ResultSet res = pStmt.executeQuery();
 			if (res.next()) {
-				return new Matricula(res.getLong("id_matricula"),res.getInt("id_alumno"), res.getInt("id_curso"), res.getDate("fecha_inicio"));
+				return new Matricula(res.getLong("id_matricula"), res.getInt("id_alumno"), res.getInt("id_curso"),
+						res.getDate("fecha_inicio"));
 			} else {
-			    return null;
+				return null;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	@Override
 	public int grabarMatricula(Matricula matricula) {
 		try {
 			Connection con = getConnection();
 			String query = "INSERT INTO matriculas (id_alumno, id_curso, fecha_inicio) VALUES(?,?,?);";
 			PreparedStatement pStmt = con.prepareStatement(query);
-			//pStmt.setLong(1, matricula.getIdmatricula());
+			// pStmt.setLong(1, matricula.getIdmatricula());
 			pStmt.setInt(1, matricula.getIdAlumno());
 			pStmt.setInt(2, matricula.getIdCurso());
 			pStmt.setDate(3, new java.sql.Date(matricula.getFechaInicio().getTime()));
@@ -383,5 +485,5 @@ public class AcademiaDAOImplJDBC implements AcademiaDAO {
 			return -1;
 		}
 	}
-	
+
 }

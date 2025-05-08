@@ -7,6 +7,8 @@ public class Alumno implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int idAlumno;
 	private String nombreAlumno;
+	private byte[] foto;
+
 	
 	public Alumno() {}
 	
@@ -27,6 +29,16 @@ public class Alumno implements Serializable {
 	public void setNombreAlumno(String nombreAlumno) {
 		this.nombreAlumno = nombreAlumno;
 	}
+	
+	public byte[] getFoto() {
+		return foto;
+	}
+
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
+	}
+
+	
 	public String toString() {
 		return this.idAlumno+" - "+this.nombreAlumno;
 	}
