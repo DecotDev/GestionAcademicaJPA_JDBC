@@ -12,6 +12,7 @@ public class Matricula implements Serializable {
 
 	@Id
 	@Column(name = "id_matricula")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long idMatricula;
 
 	@Column(name = "id_alumno")
@@ -20,7 +21,8 @@ public class Matricula implements Serializable {
 	@Column(name = "id_curso")
 	private int idCurso;
 
-	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "fecha_inicio")
+	@Temporal(TemporalType.DATE)
 	private Date fechaInicio;
 
 	@Transient
