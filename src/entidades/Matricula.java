@@ -1,29 +1,44 @@
 package entidades;
 
 import java.io.Serializable;
+import jakarta.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "matriculas")
 public class Matricula implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "id_matricula")
 	private long idMatricula;
+
+	@Column(name = "id_alumno")
 	private int idAlumno;
+
+	@Column(name = "id_curso")
 	private int idCurso;
+
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaInicio;
-	
+
+	@Transient
+	private Alumno alumno;
+
 	public Matricula(long idmatricula, int idAlumno, int idCurso) {
 		this.idMatricula = idmatricula;
 		this.idAlumno = idAlumno;
 		this.idCurso = idCurso;
 		this.fechaInicio = new Date(System.currentTimeMillis());
 	}
-	
+
 	public Matricula(int idAlumno, int idCurso) {
 		this.idAlumno = idAlumno;
 		this.idCurso = idCurso;
 		this.fechaInicio = new Date(System.currentTimeMillis());
 	}
-	
+
 	public Matricula(long idmatricula, int idAlumno, int idCurso, Date fecha_inicio) {
 		this.idMatricula = idmatricula;
 		this.idAlumno = idAlumno;
@@ -66,5 +81,5 @@ public class Matricula implements Serializable {
 	public String toString() {
 		return this.idMatricula + " - " + this.idAlumno + " - " + this.idCurso + " - " + this.fechaInicio;
 	}
-	
+
 }
