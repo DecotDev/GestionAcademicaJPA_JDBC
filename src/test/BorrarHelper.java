@@ -1,6 +1,7 @@
 package test;
 
 import dao.AcademiaDAO;
+import dao.DAOFactory;
 import dao.AcademiaDAOImplJDBC;
 import entidades.Alumno;
 import entidades.Curso;
@@ -13,7 +14,8 @@ public class BorrarHelper {
 
     public BorrarHelper() {
         System.out.println("Creando el DAO...");
-        dao = new AcademiaDAOImplJDBC();
+        //dao = new AcademiaDAOImplJDBC();
+        dao = DAOFactory.getAcademiaDAO();
     }
 
     private void borrarMatriculas() {
