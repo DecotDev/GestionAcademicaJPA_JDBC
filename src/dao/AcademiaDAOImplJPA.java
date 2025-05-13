@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.*;
 
 public class AcademiaDAOImplJPA implements AcademiaDAO {
-	private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("AcademiaPU");
+	private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("AcademiaPersistanceUnit");
 
 	private EntityManager em() {
 		return emf.createEntityManager();

@@ -9,10 +9,10 @@ public class DAOFactory {
 
   static {
     try (InputStream in = DAOFactory.class.getResourceAsStream("/config.properties")) {
-      Properties p = new Properties();
-      p.load(in);
-      mode = p.getProperty("persistence.mode", "JDBC");
-      jdbcUrl = p.getProperty("jdbc.url");
+      Properties properties = new Properties();
+      properties.load(in);
+      mode = properties.getProperty("persistence.mode", "JDBC");
+      jdbcUrl = properties.getProperty("jdbc.url");
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
