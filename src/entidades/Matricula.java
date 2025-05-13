@@ -28,6 +28,8 @@ public class Matricula implements Serializable {
 	@Transient
 	private Alumno alumno;
 
+	public Matricula() {}
+	
 	public Matricula(long idmatricula, int idAlumno, int idCurso) {
 		this.idMatricula = idmatricula;
 		this.idAlumno = idAlumno;
